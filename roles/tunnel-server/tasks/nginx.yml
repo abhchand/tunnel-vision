@@ -1,0 +1,110 @@
+#
+# Install NGINX
+#
+
+- name: Update apt-get
+  apt:
+    update_cache: yes
+
+- name: Add Nginx Repository
+  apt_repository:
+    repo: 'ppa:nginx/stable'
+    state: present
+  register: ppastable
+
+- name: Install Nginx
+  apt:
+    pkg: nginx
+    state: present
+  when: ppastable is succeeded
+  notify:
+    - Start Nginx
+
+- name: Disable Nginx Default Site
+  file:
+    dest: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Remove package example_ssl.conf
+  file:
+    dest: /etc/nginx/conf.d/example_ssl.conf
+    state: absent
+  notify:
+    - Restart Nginx
+
+#
+# Configure NGINX
+#
+
+- name: Create NGINX Web root directory
+  file:
+    path: "{{ app_webroot }}"
+    state: directory
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
+    mode: 0755
+
+- name: Create test index HTML file in Web root directory
+  copy:
+    dest: "{{ app_webroot }}/index.html"
+    content: "<html><body><h1>{{ app_domain }}: This page works!</h1></body></html>"
+
+# The nginx config files below will be generated
+# *without* any SSL directives. That's because the SSL
+# certs may not exist yet and the NGINX config file
+# will be invalid if it tries to reference them.
+#
+# Unfortunately we can't generate the SSL certs first
+# because they require NGINX config files to
+# validate the domain.
+#
+# So we do the following:
+#
+#   1. Generate NGINX configs without any SSL
+#      information (below)
+#
+#   2. Generate the certificates for any needed
+#      domains (`certificates.yml`)
+#
+#   3. Re-generate these config files later, but this
+#      time with the SSL information (`certificates.yml`)
+
+- name: Add Nginx main config
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
+    mode: 0755
+  notify:
+    - Restart Nginx
+
+- name: Add Nginx site config for `{{ app_domain }}`
+  template:
+    src: site.conf.j2
+    dest: /etc/nginx/sites-available/{{ app_domain }}.conf
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
+    mode: 0755
+  notify:
+    - Restart Nginx
+
+- name: Enable Nginx site config for `{{ app_domain }}`
+  file:
+    src: /etc/nginx/sites-available/{{ app_domain }}.conf
+    dest: /etc/nginx/sites-enabled/{{ app_domain }}.conf
+    state: link
+  notify:
+    - Restart Nginx
+
+- name: Add Nginx tunnel config
+  template:
+    src: tunnel.conf.j2
+    dest: /etc/nginx/conf.d/tunnel.conf
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
+    mode: 0755
+  with_items:
+    - "{{ tunnel }}"
+  notify:
+    - Restart Nginx

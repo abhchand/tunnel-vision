@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+HELP_TEXT="Usage: bin/run TIER OTHER_OPTS"
+RED="\033[0;31m"
+NC="\033[0m" # No Color
+
+if [ -n "$1" ]
+then
+  TIER=$1
+else
+  echo -e "${RED}Must specify TIER (dev, prod)${NC}"
+  echo -e $HELP_TEXT
+  echo ""
+  exit 1
+fi
+
+if [ -n "$2" ]
+then
+  OTHER_OPTS=$2
+else
+  OTHER_OPTS=""
+fi
+
+echo "...Running on TIER $TIER"
+echo "...Running with options: '$OTHER_OPTS'"
+
+ansible-playbook \
+  --ask-pass \
+  --ask-become-pass \
+  --vault-password-file ./vault-password \
+  --user=ansible \
+  --limit $TIER \
+  --inventory=hosts.ini \
+  $OTHER_OPTS \
+  plays/tunnel.yml

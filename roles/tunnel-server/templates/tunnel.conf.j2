@@ -1,0 +1,76 @@
+# #############################################################################
+# This file is managed by Ansible. Any changes may be overwritten.
+# #############################################################################
+
+server {
+  {% if app_domain_certs_exist|d(False) == True %}
+  listen       443 ssl;
+  {% else %}
+  listen       443;
+  {% endif %}
+  server_name  ~^(?<user>([^.-]+))\.{{ app_domain | replace(".", "\\.") }};
+  client_max_body_size 100M;
+
+  {% if app_domain_certs_exist|d(False) == True %}
+  ssl_certificate     {{ letsencrypt_dir }}/live/{{ app_domain }}/fullchain.pem;
+  ssl_certificate_key {{ letsencrypt_dir }}/live/{{ app_domain }}/privkey.pem;
+  {% endif %}
+
+  location / {
+
+    {% for name in item.users -%}
+    if ($user ~* "{{ name }}") {
+      set  $tunnel_port  {{ item.base_port + loop.index - 1 }};
+    }
+    {% endfor -%}
+
+    # Increase proxy_buffers size to 1Mb (accomodates unminified dev JS)
+    proxy_buffers 192 16k;
+
+    proxy_set_header  X-Real-IP  $remote_addr;
+    proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header  X-Original-Host $http_host;
+    proxy_set_header  Host callrail.test;
+    proxy_redirect    http://callrail.test/ http://$http_host/;
+    proxy_pass        http://127.0.0.1:$tunnel_port;
+
+    access_log /var/log/nginx/tunnel.log;
+  }
+}
+
+server {
+  {% if app_domain_certs_exist|d(False) == True %}
+  listen       443 ssl;
+  {% else %}
+  listen       443;
+  {% endif %}
+  server_name  ~^(?<user>([^.-]+))\-(?<application>([^.]+))\.{{ app_domain | replace(".", "\\.") }};
+  client_max_body_size 100M;
+
+  {% if app_domain_certs_exist|d(False) == True %}
+  ssl_certificate     {{ letsencrypt_dir }}/live/{{ app_domain }}/fullchain.pem;
+  ssl_certificate_key {{ letsencrypt_dir }}/live/{{ app_domain }}/privkey.pem;
+  {% endif %}
+
+  location / {
+
+    {% for name in item.users -%}
+    if ($user ~* "{{name}}") {
+      set  $tunnel_port  {{ item.base_port + loop.index - 1 }};
+    }
+    {% endfor -%}
+
+    # Increase proxy_buffers size to 1Mb (accomodates unminified dev JS)
+    proxy_buffers 192 16k;
+
+    proxy_set_header  X-Real-IP  $remote_addr;
+    proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header  X-Original-Host $http_host;
+    proxy_set_header  Host $application.test;
+    proxy_redirect    http://$application.test/ http://$http_host/;
+    proxy_pass        http://127.0.0.1:$tunnel_port;
+
+    access_log /var/log/nginx/tunnel.log;
+  }
+}
+

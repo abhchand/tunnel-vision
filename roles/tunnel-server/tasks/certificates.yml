@@ -1,0 +1,111 @@
+---
+
+#
+# Install Certbot (via Snapd)
+#
+
+- name: Install Certbot
+  apt:
+    pkg: certbot
+    state: present
+
+- name: Install DigitalOcean Cerbot Plugin
+  apt:
+    pkg: python3-certbot-dns-digitalocean
+    state: present
+
+- name: Create certbot credentials file
+  copy:
+    dest: "~/certbot-creds.ini"
+    content: "dns_digitalocean_token = {{ digitalocean_api_key }}\n"
+    owner: "{{ ssl_management_user }}"
+    group: "{{ ssl_management_user }}"
+    mode: 0700
+
+- name: Allow `{{ ssl_management_user }}` user to write to letsencrypt log directory
+  file:
+    path: "{{ letsencrypt_log_dir }}"
+    state: directory
+    owner: "{{ ssl_management_user }}"
+    group: "{{ ssl_management_user }}"
+    recurse: yes
+    mode: 0700
+
+
+#
+# Fetch initial certificates
+#
+
+- name: Create `certbot-init` script
+  template:
+    src: certbot-init.sh.j2
+    dest: "{{ certbot_scripts_dir }}/certbot-init"
+    owner: "{{ ssl_management_user }}"
+    group: "{{ ssl_management_user }}"
+    mode: 0754
+
+- name: Run `certbot-init` script
+  command: "{{ certbot_scripts_dir }}/certbot-init"
+
+
+#
+# Re-generate NGINX configs
+# (See `nginx.yml` comment for context)
+#
+
+- name: Check if certificates exist
+  stat:
+    # Pick an arbitrary file to test with
+    path: "{{ letsencrypt_dir }}/live/{{ app_domain }}/fullchain.pem"
+  register: cert_stat_result
+
+- name: Register that certificates exist
+  when:
+  set_fact:
+    app_domain_certs_exist: "{{ cert_stat_result.stat.exists }}"
+
+- name: Re-generate Nginx site config for `{{ app_domain }}`
+  when: app_domain_certs_exist|d(False) == True
+  template:
+    src: site.conf.j2
+    dest: /etc/nginx/sites-available/{{ app_domain }}.conf
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
+    mode: 0755
+  notify:
+    - Restart Nginx
+
+- name: Re-generate Nginx tunnel config
+  when: app_domain_certs_exist|d(False) == True
+  template:
+    src: tunnel.conf.j2
+    dest: /etc/nginx/conf.d/tunnel.conf
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
+    mode: 0755
+  with_items:
+    - "{{ tunnel }}"
+  notify:
+    - Restart Nginx
+
+
+
+# Certbot automatically schedules itself to check twice a day
+# for renewal (`certbot renew`). It registers itself as a system
+# service:
+#
+# ```
+# sudo systemctl status certbot.timer
+# ```
+#
+# We want to verify Certificate auto-renewal is enabled
+
+- name: Capture system status
+  shell: "systemctl status certbot.timer | grep \"Active: active\""
+  args:
+    warn: no
+  register: certbot_timer
+
+- name: Assert Certbot timer is active
+  assert:
+    that: "certbot_timer.stdout_lines|length>0"

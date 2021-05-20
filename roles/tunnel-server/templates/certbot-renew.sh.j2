@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# #############################################################################
+# This file is managed by Ansible. Any changes may be overwritten.
+# #############################################################################
+
+LOG="{{ letsencrypt_log_dir }}/renew.log"
+
+# Log
+echo $(date)' | Renewal' >> $LOG
+
+# Renew
+if ! {{ certbot_scripts_dir }}/certbot-auto renew --no-self-upgrade --agree-tos {% if env_development == True %}--test-cert --dry-run{% endif %} --post-hook "service nginx restart" >> $LOG 2>&1 ; then
+  echo $(date)' | Automated Renewal Failed' >> $LOG
+  exit 1
+fi

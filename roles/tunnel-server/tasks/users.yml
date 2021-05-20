@@ -1,0 +1,6 @@
+---
+- name: Create user `{{ deploy_user }}`
+  user:
+    name: "{{ deploy_user }}"
+    password: "{{ '%s' | format(deploy_user_password) | password_hash('sha512', deploy_user_salt) }}"
+    shell: /bin/bash

@@ -1,0 +1,7 @@
+---
+- include_tasks: users.yml
+  tags: ["tunnel-server:users"]
+- include_tasks: nginx.yml
+  tags: ["tunnel-server:nginx"]
+- include_tasks: certificates.yml
+  tags: ["tunnel-server:certificates"]

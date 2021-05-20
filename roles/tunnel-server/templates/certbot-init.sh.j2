@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# #############################################################################
+# This file is managed by Ansible. Any changes may be overwritten.
+# #############################################################################
+
+if [ ! -d "{{ letsencrypt_dir }}/live/{{ app_domain }}" ]; then
+  echo 'Certificates already exist!'
+  exit
+fi
+
+LOG="{{ letsencrypt_log_dir }}/init.log"
+
+echo "Logging to $LOG"
+echo $(date)' | Fetching certificates for {{ app_domain }}, *.{{ app_domain }}' >> $LOG
+
+certbot certonly \
+  --dns-digitalocean \
+  --dns-digitalocean-credentials ~/certbot-creds.ini \
+  -d {{ app_domain }} \
+  -d "{{ app_domain }}" \
+  -n \
+  --agree-tos \
+  --text \
+  --email {{ letsencrypt_email }} \
+  {% if env_development == True %}--test-cert --dry-run{% endif %} >> $LOG 2>&1
