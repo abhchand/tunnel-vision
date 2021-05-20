@@ -79,9 +79,9 @@
   notify:
     - Restart Nginx
 
-- name: Add Nginx site config for `{{ app_domain }}`
+- name: Add Nginx site config
   template:
-    src: site.conf.j2
+    src: site-http.conf.j2
     dest: /etc/nginx/sites-available/{{ app_domain }}.conf
     owner: "{{ nginx_user }}"
     group: "{{ nginx_user }}"
@@ -89,22 +89,10 @@
   notify:
     - Restart Nginx
 
-- name: Enable Nginx site config for `{{ app_domain }}`
+- name: Enable Nginx site config
   file:
     src: /etc/nginx/sites-available/{{ app_domain }}.conf
     dest: /etc/nginx/sites-enabled/{{ app_domain }}.conf
     state: link
-  notify:
-    - Restart Nginx
-
-- name: Add Nginx tunnel config
-  template:
-    src: tunnel.conf.j2
-    dest: /etc/nginx/conf.d/tunnel.conf
-    owner: "{{ nginx_user }}"
-    group: "{{ nginx_user }}"
-    mode: 0755
-  with_items:
-    - "{{ tunnel }}"
   notify:
     - Restart Nginx

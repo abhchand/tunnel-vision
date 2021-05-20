@@ -2,19 +2,52 @@
 # This file is managed by Ansible. Any changes may be overwritten.
 # #############################################################################
 
-server {
-  {% if app_domain_certs_exist|d(False) == True %}
-  listen       443 ssl;
-  {% else %}
-  listen       443;
-  {% endif %}
-  server_name  ~^(?<user>([^.-]+))\.{{ app_domain | replace(".", "\\.") }};
-  client_max_body_size 100M;
+#
+# Blindly redirect all HTTP traffic to HTTPS
+#
 
-  {% if app_domain_certs_exist|d(False) == True %}
+server {
+  listen 80;
+
+  server_name {{ app_domain }};
+
+  return 301 https://$host$request_uri;
+}
+
+#
+# Serve static content on {{ app_domain }} from {{ app_webroot }}
+#
+
+server {
+  listen 443 ssl;
+
+  server_name {{ app_domain }};
+
+  root {{ app_webroot }};
+  index index.html;
+
   ssl_certificate     {{ letsencrypt_dir }}/live/{{ app_domain }}/fullchain.pem;
   ssl_certificate_key {{ letsencrypt_dir }}/live/{{ app_domain }}/privkey.pem;
-  {% endif %}
+
+  location / {
+    try_files $uri $uri/ =404;
+  }
+}
+
+#
+# Forward any requests to <user>.{{ app_domain }} to the appropriate
+# local tunnel
+#
+
+server {
+  listen 443 ssl;
+
+  server_name  ~^(?<user>([^.-]+))\.{{ app_domain | replace(".", "\\.") }};
+
+  client_max_body_size 100M;
+
+  ssl_certificate     {{ letsencrypt_dir }}/live/{{ app_domain }}/fullchain.pem;
+  ssl_certificate_key {{ letsencrypt_dir }}/live/{{ app_domain }}/privkey.pem;
 
   location / {
 
@@ -38,19 +71,20 @@ server {
   }
 }
 
+#
+# Forward any requests to <user>-<application>.{{ app_domain }} to the appropriate
+# local tunnel
+#
+
 server {
-  {% if app_domain_certs_exist|d(False) == True %}
-  listen       443 ssl;
-  {% else %}
-  listen       443;
-  {% endif %}
+  listen 443 ssl;
+
   server_name  ~^(?<user>([^.-]+))\-(?<application>([^.]+))\.{{ app_domain | replace(".", "\\.") }};
+
   client_max_body_size 100M;
 
-  {% if app_domain_certs_exist|d(False) == True %}
   ssl_certificate     {{ letsencrypt_dir }}/live/{{ app_domain }}/fullchain.pem;
   ssl_certificate_key {{ letsencrypt_dir }}/live/{{ app_domain }}/privkey.pem;
-  {% endif %}
 
   location / {
 
@@ -73,4 +107,3 @@ server {
     access_log /var/log/nginx/tunnel.log;
   }
 }
-

@@ -1,0 +1,18 @@
+# #############################################################################
+# This file is managed by Ansible. Any changes may be overwritten.
+# #############################################################################
+
+# Serve static non-SSL content on {{ app_domain }} from {{ app_webroot }}
+
+server {
+  listen 80;
+
+  server_name {{ app_domain }};
+
+  root {{ app_webroot }};
+  index index.html;
+
+  location / {
+    try_files $uri $uri/ =404;
+  }
+}
