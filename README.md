@@ -1,4 +1,4 @@
-[pipe.cr-tunnel.xyz](https://pipe.cr-tunnel.xyz/) provides a public URL for your localhost environment (similar to [`ngrok`](https://ngrok.com/)).
+[`pipe.cr-tunnel.xyz`](https://pipe.cr-tunnel.xyz/) provides a public URL for your localhost environment (similar to [`ngrok`](https://ngrok.com/)).
 
 This repository contains the ansible playbook for provisioning the server.
 
