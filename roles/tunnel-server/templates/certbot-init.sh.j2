@@ -18,7 +18,7 @@ certbot certonly \
   --dns-digitalocean \
   --dns-digitalocean-credentials ~/certbot-creds.ini \
   -d {{ app_domain }} \
-  -d "{{ app_domain }}" \
+  -d "*.{{ app_domain }}" \
   -n \
   --agree-tos \
   --text \
