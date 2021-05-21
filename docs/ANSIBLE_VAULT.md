@@ -12,7 +12,7 @@ manually.
 
 You'll need the master vault password in a local file:
 ```bash
-echo $MASTER_PASSWORD > ./vault-password
+echo $MASTER_PASSWORD > ./ansible-vault-password
 ```
 
 Alternately you can ask to be prompted for the password using
@@ -21,7 +21,7 @@ Alternately you can ask to be prompted for the password using
 # Encrypt
 
 ```bash
-ansible-vault encrypt_string mySecretString --vault-password-file ./vault-password
+ansible-vault encrypt_string mySecretString --vault-password-file ./ansible-vault-password
 ```
 
 # Decrypt
@@ -32,5 +32,5 @@ echo -e '$ANSIBLE_VAULT;1.1;AES256
 3931333861623538313132663939923738343030393034640a663834353738623663346365316363
 32376437356336393535376430316232326231316239393337643062623837313035316139373761
 3735346534326438650a383966663166646537333263613366326436316161363461616139631286
-3264' | ansible-vault decrypt --vault-password-file ./vault-password && echo
+3264' | ansible-vault decrypt --vault-password-file ./ansible-vault-password && echo
 ```

@@ -23,8 +23,15 @@ if [ ! -f "$ANSIBLE_USER_FILE" ]; then
   exit 1
 fi
 
+# Verify ansible-vault Credentials exist
+ANSIBLE_VAULT_FILE="$(pwd)/ansible-vault-password"
+if [ ! -f "$ANSIBLE_VAULT_FILE" ]; then
+  echo -e "${RED}Missing credentials file: $ANSIBLE_VAULT_FILE${NC}"
+  exit 1
+fi
+
 ansible-playbook \
-  --vault-password-file ./vault-password \
+  --vault-password-file $ANSIBLE_VAULT_FILE \
   --user=ansible \
   --limit $TIER \
   --inventory=hosts.ini \

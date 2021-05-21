@@ -85,7 +85,7 @@ You'll need:
 Store the credentials for `ansible` to read:
 
 ```bash
-echo "your-ansible-vault-password" > ./vault-password
+echo "your-ansible-vault-password" > ./ansible-vault-password
 echo "your-ansible-user-password" > ./ansible-user-password
 ```
 
