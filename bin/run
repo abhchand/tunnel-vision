@@ -16,11 +16,17 @@ fi
 
 echo "...Running on TIER $TIER"
 
+# Read Ansible User Credentials
+ANSIBLE_USER_FILE="$(pwd)/ansible-user-password"
+if [ ! -f "$ANSIBLE_USER_FILE" ]; then
+  echo -e "${RED}Missing credentials file: $ANSIBLE_USER_FILE${NC}"
+  exit 1
+fi
+
 ansible-playbook \
-  --ask-pass \
-  --ask-become-pass \
   --vault-password-file ./vault-password \
   --user=ansible \
   --limit $TIER \
   --inventory=hosts.ini \
+  --extra-vars "ansible_password=$(cat $ANSIBLE_USER_FILE | xargs) ansible_sudo_pass=$(cat $ANSIBLE_USER_FILE | xargs)" \
   plays/tunnel.yml

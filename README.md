@@ -82,10 +82,11 @@ You'll need:
 
 ### Running the Playbook
 
-Store the `ansible-vault` password for `ansible` to read:
+Store the credentials for `ansible` to read:
 
 ```bash
 echo "your-ansible-vault-password" > ./vault-password
+echo "your-ansible-user-password" > ./ansible-user-password
 ```
 
 Then, run the playbook
@@ -93,12 +94,6 @@ Then, run the playbook
 ```bash
 bin/run prod
 ```
-
-Notes:
-
-* You'll be prompted for the `ansible@pipe.cr-tunnel.xyz` ssh password
-* The `BECOME` password is the same value
-
 
 ## Development (Virtual Machine)
 
@@ -151,8 +146,3 @@ gpasswd -a ansible sudo
 ```bash
 bin/run dev
 ```
-
-Notes:
-
-* You'll be prompted for the `ansible@dev-pipe.cr-tunnel.xyz` ssh password
-* The `BECOME` password is the same value
