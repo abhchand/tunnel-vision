@@ -1,6 +1,8 @@
 [pipe.cr-tunnel.xyz](https://pipe.cr-tunnel.xyz/) provides a public URL for your localhost environment (similar to [`ngrok`](https://ngrok.com/)).
 
-This repository contains the ansible playbook for provisioning the server
+This repository contains the ansible playbook for provisioning the server.
+
+---
 
 - [User Setup](#user-setup)
     + [One-time Setup](#one-time-setup)
