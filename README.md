@@ -51,7 +51,7 @@ Match host pipe.cr-tunnel.xyz user exec
    IdentityFile ~/.ssh/<your-key>.pub
 ```
 
-Finally, submit a pull request to add your name to the [configuration](roles/tunnel-server/vars/main.yml). You'll specify your username, the above **public** key, and a unique port number.
+Finally, submit a pull request to add your name to the [`tunnel_users` in the configuration file](roles/tunnel-server/vars/main.yml). You'll specify your username, the above **public** key, and a unique port number.
 
 Example:
 
