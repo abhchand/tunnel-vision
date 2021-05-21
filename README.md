@@ -74,7 +74,7 @@ export USERNAME=abhishek
 
 ssh -nNT -g -R "*:$REMOTE_PORT:0.0.0.0:$LOCAL_PORT" exec@pipe.cr-tunnel.xyz
 
-open "$USERNAME.pipe.cr-tunnel.xyz"
+open "https://$USERNAME.pipe.cr-tunnel.xyz/"
 ```
 
 # Developer Setup
