@@ -9,6 +9,9 @@ app_webroot: /var/www/data/pipe.cr-tunnel.xyz
 exec_user: exec
 nginx_user: www-data
 
+localhost_target_default: callrail.test
+localhost_target_application: $application.test
+
 ssl_management_user: root
 certbot_scripts_dir: /usr/local/bin
 letsencrypt_dir: /etc/letsencrypt
