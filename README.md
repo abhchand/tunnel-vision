@@ -1,7 +1,7 @@
 <div align="center">
   <a href="https://github.com/abhchand/tunnel-vision">
     <img
-      width="200"
+      width="150"
       alt="tunnel-vision"
       src="meta/logo.png?raw=true"
     />
