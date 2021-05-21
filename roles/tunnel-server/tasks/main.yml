@@ -1,4 +1,6 @@
 ---
+- include_tasks: ssh.yml
+  tags: ["tunnel-server:ssh"]
 - include_tasks: users.yml
   tags: ["tunnel-server:users"]
 - include_tasks: nginx.yml

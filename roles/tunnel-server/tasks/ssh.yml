@@ -1,0 +1,13 @@
+---
+
+- name: Configure System sshd_config
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    line: "{{ item.line }}"
+    regexp: "{{ item.regex }}"
+  with_items:
+    - line: AuthorizedKeysFile %h/.ssh/authorized_keys
+      regex: AuthorizedKeysFile
+    - line: PermitUserEnvironment yes
+      regex: PermitUserEnvironment
+  notify: Restart sshd

@@ -51,9 +51,9 @@ server {
 
   location / {
 
-    {% for name in item.users -%}
-    if ($user ~* "{{ name }}") {
-      set  $tunnel_port  {{ item.base_port + loop.index - 1 }};
+    {% for user in tunnel_users %}
+    if ($user ~* "{{ user.name }}") {
+      set  $tunnel_port  {{ user.unique_port }};
     }
     {% endfor -%}
 
@@ -88,9 +88,9 @@ server {
 
   location / {
 
-    {% for name in item.users -%}
-    if ($user ~* "{{name}}") {
-      set  $tunnel_port  {{ item.base_port + loop.index - 1 }};
+    {% for user in tunnel_users %}
+    if ($user ~* "{{ user.name }}") {
+      set  $tunnel_port  {{ user.unique_port }};
     }
     {% endfor -%}
 

@@ -8,3 +8,8 @@
   service:
     name: nginx
     state: reloaded
+
+- name: Restart sshd
+  service:
+    name: "{{ 'ssh' if ansible_distribution_release == 'trusty' else 'sshd' }}"
+    state: reloaded

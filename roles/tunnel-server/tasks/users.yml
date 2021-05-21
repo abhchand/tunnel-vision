@@ -1,6 +1,21 @@
 ---
-- name: Create user `{{ deploy_user }}`
+- name: Add user {{ exec_user }}
   user:
-    name: "{{ deploy_user }}"
-    password: "{{ '%s' | format(deploy_user_password) | password_hash('sha512', deploy_user_salt) }}"
+    name: "{{ exec_user }}"
     shell: /bin/bash
+
+- name: Configure SSH directory for user {{ exec_user }}
+  file:
+    path: /home/{{ exec_user }}/.ssh
+    state: directory
+    owner: "{{ exec_user }}"
+    group: "{{ exec_user }}"
+    mode: 0700
+
+- name: Install SSH keys for user {{ exec_user }}
+  template:
+    src: authorized_keys.j2
+    dest: /home/{{ exec_user }}/.ssh/authorized_keys
+    owner: "{{ exec_user }}"
+    group: "{{ exec_user }}"
+    mode: 0600

@@ -1,0 +1,5 @@
+## Authorized Keys
+{% for user in tunnel_users %}
+# {{ user.name }}
+environment="REMOTEUSER={{ user.name }}" {{ user.public_key }}
+{% endfor %}
