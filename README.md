@@ -73,13 +73,13 @@ sudo vi /etc/hosts
 
 # Add below line.
 # Hostname must match value in `hosts.ini` configuration!
-127.0.0.1       dev-001.cr-tunnel.xyz
+127.0.0.1       pipe-dev.cr-tunnel.xyz
 ```
 
 You can now access the virtual machine from your local host
 
 ```
-ssh -p 2222 dev-001.cr-tunnel.xyz
+ssh -p 2222 pipe-dev.cr-tunnel.xyz
 ```
 
 ### `ansible` user setup
