@@ -65,9 +65,12 @@ tunnel_users:
 ### Start the Tunnel
 
 ```bash
-export REMOTE_PORT=1738 # As configured in your pull request above
-export LOCAL_PORT=3000
+export REMOTE_PORT=1738   # As configured in your pull request above
+export LOCAL_PORT=3000    # Your local target application should run on this port
 export USERNAME=abhishek
+
+# 1. Start your local application on $LOCAL_PORT
+# 2. Start the tunnel:
 
 ssh -nNT -g -R "*:$REMOTE_PORT:0.0.0.0:$LOCAL_PORT" exec@pipe.cr-tunnel.xyz
 
