@@ -41,9 +41,9 @@ Ensure the local application you are tunneling to is running on `$APP_HOST` and 
 
 ```bash
 tunnel-vision start -u $USER -h $APP_HOST -p $APP_PORT
-
-open "https://$USER.pipe.cr-tunnel.xyz/"
 ```
+
+Then visit `"https://$USER.pipe.cr-tunnel.xyz/"` in your browser.
 
 ### One-time Setup
 
