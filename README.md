@@ -37,7 +37,7 @@
 
 ⚠️ **NOTE**: Make sure you've completed the **one-time setup** below before running this
 
-Ensure the application you are tunneling to is running on `$APP_HOST` and `$APP_PORT`
+Ensure the local application you are tunneling to is running on `$APP_HOST` and `$APP_PORT`
 
 ```bash
 tunnel-vision start -u $USER -h $APP_HOST -p $APP_PORT
