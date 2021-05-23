@@ -16,6 +16,9 @@
 
 - [User Setup](#user-setup)
     + [One-time Setup](#one-time-setup)
+        * [SSH Setup](#ssh-setup)
+        * [Register new user](#register-new-user)
+        * [Install Client](#install-client)
     + [Start the Tunnel](#start-the-tunnel)
 - [Developer Setup](#developer-setup)
   * [Production](#production)
@@ -32,7 +35,9 @@
 
 ### One-time Setup
 
-First, create an SSH keypair:
+##### SSH Setup
+
+Create an SSH keypair:
 
 ```
 ssh-keygen -t rsa
@@ -51,7 +56,9 @@ Match host pipe.cr-tunnel.xyz user exec
    IdentityFile ~/.ssh/<your-key>.pub
 ```
 
-Finally, submit a pull request to add your name to the [`tunnel_users` in the configuration file](roles/tunnel-server/vars/main.yml). You'll specify your username, the above **public** key, and a unique port number.
+##### Register new user
+
+Submit a pull request to add your name, public key, and port to the [`tunnel_users` in the configuration file](roles/tunnel-server/vars/main.yml).
 
 Example:
 
@@ -62,19 +69,20 @@ tunnel_users:
     public_key: ssh-rsa AAAAB3NzaC1...
 ```
 
-### Start the Tunnel
+##### Install Client
 
 ```bash
-export REMOTE_PORT=1738   # As configured in your pull request above
-export LOCAL_PORT=3000    # Your local target application should run on this port
-export USERNAME=abhishek
+curl 'https://raw.githubusercontent.com/abhchand/tunnel-vision/master/lib/client/ruby/install.sh' | sh
+```
 
-# 1. Start your local application on $LOCAL_PORT
-# 2. Start the tunnel:
+### Start the Tunnel
 
-ssh -nNT -g -R "*:$REMOTE_PORT:0.0.0.0:$LOCAL_PORT" exec@pipe.cr-tunnel.xyz
+Ensure the application you are tunneling to is running on `$APP_HOST` and `$APP_PORT`
 
-open "https://$USERNAME.pipe.cr-tunnel.xyz/"
+```bash
+tunnel-vision start -u $USER -h $APP_HOST -p $APP_PORT
+
+open "https://$USER.pipe.cr-tunnel.xyz/"
 ```
 
 # Developer Setup
