@@ -14,12 +14,12 @@
 
 ---
 
-- [User Setup](#user-setup)
-    + [One-time Setup](#one-time-setup)
-        * [SSH Setup](#ssh-setup)
-        * [Register new user](#register-new-user)
-        * [Install Client](#install-client)
+- [Usage](#usage)
     + [Start the Tunnel](#start-the-tunnel)
+    + [One-time Setup](#one-time-setup)
+      - [SSH Setup](#ssh-setup)
+      - [Register new user](#register-new-user)
+      - [Install the Ruby Client](#install-the-ruby-client)
 - [Developer Setup](#developer-setup)
   * [Production](#production)
     + [Pre-requisites](#pre-requisites)
@@ -31,11 +31,23 @@
     + [Run the playbook](#run-the-playbook)
 
 
-# User Setup
+# Usage
+
+### Start the Tunnel
+
+⚠️ **NOTE**: Make sure you've completed the **one-time setup** below before running this
+
+Ensure the application you are tunneling to is running on `$APP_HOST` and `$APP_PORT`
+
+```bash
+tunnel-vision start -u $USER -h $APP_HOST -p $APP_PORT
+
+open "https://$USER.pipe.cr-tunnel.xyz/"
+```
 
 ### One-time Setup
 
-##### SSH Setup
+#### SSH Setup
 
 Create an SSH keypair:
 
@@ -56,7 +68,7 @@ Match host pipe.cr-tunnel.xyz user exec
    IdentityFile ~/.ssh/<your-key>.pub
 ```
 
-##### Register new user
+#### Register new user
 
 Submit a pull request to add your name, public key, and port to the [`tunnel_users` in the configuration file](roles/tunnel-server/vars/main.yml).
 
@@ -69,20 +81,10 @@ tunnel_users:
     public_key: ssh-rsa AAAAB3NzaC1...
 ```
 
-##### Install Client
+#### Install the Ruby Client
 
 ```bash
 curl 'https://raw.githubusercontent.com/abhchand/tunnel-vision/master/lib/client/ruby/install.sh' | sh
-```
-
-### Start the Tunnel
-
-Ensure the application you are tunneling to is running on `$APP_HOST` and `$APP_PORT`
-
-```bash
-tunnel-vision start -u $USER -h $APP_HOST -p $APP_PORT
-
-open "https://$USER.pipe.cr-tunnel.xyz/"
 ```
 
 # Developer Setup
