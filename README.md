@@ -82,7 +82,7 @@ tunnel_users:
 ### Install the Ruby Client
 
 ```bash
-curl 'https://raw.githubusercontent.com/abhchand/tunnel-vision/master/lib/client/ruby/install.sh' | sh
+curl --silent 'https://raw.githubusercontent.com/abhchand/tunnel-vision/master/lib/client/ruby/install.sh' | sh
 ```
 
 # Developer Setup

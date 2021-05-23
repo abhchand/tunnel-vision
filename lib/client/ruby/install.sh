@@ -4,7 +4,7 @@
 
 INSTALL_PATH=/usr/local/bin/tunnel-vision
 
-curl 'https://raw.githubusercontent.com/abhchand/tunnel-vision/master/lib/client/ruby/tunnel-vision.rb' > $INSTALL_PATH
+curl --silent 'https://raw.githubusercontent.com/abhchand/tunnel-vision/master/lib/client/ruby/tunnel-vision.rb' > $INSTALL_PATH
 chmod +x $INSTALL_PATH
 
 echo "Done - installed to $INSTALL_PATH"
