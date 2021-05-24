@@ -35,11 +35,12 @@
 
 ⚠️ **NOTE**: Make sure you've completed the **one-time setup** below before running this
 
-Ensure the local application you are tunneling to is running on `$APP_HOST` and `$APP_PORT`
 
 ```bash
-tunnel-vision start -u $USER -h $APP_HOST -p $APP_PORT
+tunnel-vision start -u $USER
 ```
+
+Ensure the local application you are tunneling to is running locally. See `--help` menu for options to set local hostname and port on the tunnel connection.
 
 Then visit `"https://$USER.pipe.cr-tunnel.xyz/"` in your browser.
 
