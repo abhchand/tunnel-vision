@@ -55,7 +55,7 @@ Host *
 
 Match host pipe.cr-tunnel.xyz user exec
    PreferredAuthentications publickey
-   IdentityFile ~/.ssh/<your-key>.pub
+   IdentityFile ~/.ssh/<your-key>
 ```
 
 ### Register new user
