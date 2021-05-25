@@ -1,0 +1,10 @@
+{
+  {% for u in tunnel_users %}
+  {% set offset = loop.index %}
+  "{{ u.name }}": {
+    {% for s in services %}
+    "{{ s.name }}": {{ s.base_port + offset }}{{ '' if loop.last else ',' }}
+    {% endfor -%}
+  }{{ '' if loop.last else ',' }}
+  {% endfor %}
+}

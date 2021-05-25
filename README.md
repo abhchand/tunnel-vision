@@ -14,26 +14,13 @@
 
 ---
 
-- [Quick Start](#quick-start)
 - [One-time Setup](#one-time-setup)
     + [SSH Setup](#ssh-setup)
     + [Register new user](#register-new-user)
     + [Install the Ruby Client](#install-the-ruby-client)
+- [Run](#run)
 - [Playbook Developer Setup](#playbook-developer-setup)
 
-
-# Quick Start
-
-⚠️ **NOTE**: Make sure you've completed the **one-time setup** below before running this
-
-
-```bash
-tunnel-vision start -u $USER
-```
-
-Ensure the local application you are tunneling to is running locally. See `--help` menu for options to set local hostname and port on the tunnel connection.
-
-Then visit `"https://$USER.pipe.cr-tunnel.xyz/"` in your browser.
 
 # One-time Setup
 
@@ -60,14 +47,13 @@ Match host pipe.cr-tunnel.xyz user exec
 
 ### Register new user
 
-Submit a pull request to add your name, public key, and port to the [`tunnel_users` in the configuration file](roles/tunnel-server/vars/main.yml).
+Submit a pull request to add your name and public key to the [`tunnel_users` in the configuration file](roles/tunnel-server/vars/main.yml).
 
 Example:
 
 ```yaml
 tunnel_users:
   - name: abhishek
-    unique_port: 1738
     public_key: ssh-rsa AAAAB3NzaC1...
 ```
 
@@ -76,6 +62,27 @@ tunnel_users:
 ```bash
 curl --silent 'https://raw.githubusercontent.com/abhchand/tunnel-vision/master/lib/client/ruby/install.sh' | sh
 ```
+
+# Run
+
+You'll need to start a separate tunnel for _each target application_ you'd like to connect to.
+
+Start your application (either manually, with `docker`, etc...)
+
+```bash
+bundle exec rails server -b 0.0.0.0 -p 3000 -e development
+```
+
+Start the tunnel to your `$APPLICATION` (`callrail`, `swappy`, etc..) on the same `host` and `port`
+
+```bash
+tunnel-vision start -u $USER -a $APPLICATION -h 0.0.0.0 -p 3000
+```
+
+Visit `https://$USER-$APPLICATION.pipe.cr-tunnel.xyz/` in your browser.
+
+**NOTE**: If your application is `callrail`, you can visit `https://$USER.pipe.cr-tunnel.xyz/` as a shortcut.
+
 
 # Playbook Developer Setup
 

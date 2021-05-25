@@ -26,16 +26,24 @@ class TunnelVision < Thor
 
   class InvalidArgument < ::StandardError; end
 
-  CONFIG_URL = 'https://raw.githubusercontent.com/abhchand/tunnel-vision/master/roles/tunnel-server/vars/main.yml'.freeze
-  TUNNEL_URL = 'exec@pipe.cr-tunnel.xyz'.freeze
+  TUNNEL_HOST = 'pipe.cr-tunnel.xyz'.freeze
+  TUNNEL_USER = 'exec'.freeze
+  VERSION = '0.1.0'
 
   method_option :user, required: true, aliases: '-u', desc: 'User for tunnel hostname'
+  method_option(
+    :application,
+    required: false,
+    default: 'callrail',
+    aliases: '-a',
+    desc: 'Name of your target application'
+  )
   method_option(
     :local_hostname,
     required: false,
     default: '0.0.0.0',
     aliases: '-h',
-    desc: 'Local hostname to forward requests to.'
+    desc: 'Local hostname of your target application'
   )
   method_option(
     :local_port,
@@ -43,7 +51,7 @@ class TunnelVision < Thor
     required: false,
     default: 3000,
     aliases: '-p',
-    desc: 'Port for your local development server'
+    desc: 'Local port number of your target application'
   )
   method_option(
     :remote_port,
@@ -51,15 +59,29 @@ class TunnelVision < Thor
     required: false,
     aliases: '-r',
     desc: 'Remote port to connect to on pipe server. ' +
-      'Automatically parsed from remote config file if not specified.'
+      'Automatically parsed from remote config if not specified.'
   )
 
   desc 'start', 'Start an ssh tunnel for public access'
   def start
-    command = "ssh -nNT -g -R #{config} #{TUNNEL_URL}"
+    puts <<-DEBUG
+tunnel-vision (v#{VERSION})
+
+    Application:    #{"#{options[:application]}".colorize(:cyan)}
+    Tunneling from: #{"#{TUNNEL_USER}@#{TUNNEL_HOST} (port: #{remote_port})".colorize(:cyan)}
+    Tunneling to:   #{"#{options[:local_hostname]}:#{options[:local_port]}".colorize(:cyan)}
+
+    DEBUG
+
+    command = "ssh -nNT -g -R #{config} #{TUNNEL_USER}@#{TUNNEL_HOST}"
 
     puts "executing `#{command.colorize(:yellow)}`"
     exec command
+  end
+
+  desc 'version', 'Print the version'
+  def version
+    puts VERSION
   end
 
   private
@@ -73,20 +95,20 @@ class TunnelVision < Thor
       # Try reading from the options, if specified
       return options[:remote_port] if options[:remote_port]
 
-      # Try to automatically determine this user's port from the ansible play
-      # config file mapping
+      # Try to automatically determine this user's port mapping
+      # A JSON mapping file should be available at
+      #   "https://#{TUNNEL_HOST}/users.json"
 
-      uri = URI(CONFIG_URL)
+      uri = URI("https://#{TUNNEL_HOST}/users.json")
       res = Net::HTTP.get_response(uri)
 
       cannot_determine_port! unless (200..299).include?(res.code.to_i)
 
-      found_user = YAML.load(res.body)['tunnel_users'].detect do |u|
-        u['name'] == user
-      end
+      found_user = YAML.load(res.body)[user]
       cannot_determine_port! unless found_user
+      cannot_determine_port! unless found_user.key?(options[:application])
 
-      found_user['unique_port']
+      found_user[options[:application]]
     end
   end
 
@@ -95,8 +117,8 @@ class TunnelVision < Thor
   end
 
   def cannot_determine_port!
-    msg = 'Can not determine remote port. Please specify `-r` ' +
-      "and ensure your user is configured at #{CONFIG_URL}}"
+    msg = "Can not determine remote port for #{options[:application]}. Please specify `-r` " +
+      "or ensure your remote user is configured correctly."
     raise InvalidArgument, msg.colorize(:red)
   end
 end
