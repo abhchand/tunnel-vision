@@ -89,6 +89,7 @@ tunnel-vision (v#{VERSION})
 
     DEBUG
 
+    config = "*:#{remote_port}:#{local_hostname}:#{local_port}"
     command = "ssh -nNT -g -R #{config} #{TUNNEL_USER}@#{TUNNEL_HOST}"
 
     puts "executing `#{command.colorize(:yellow)}`"
@@ -145,10 +146,6 @@ tunnel-vision (v#{VERSION})
     subdomain << application if application != DEFAULT_APPLICATION
 
     "https://#{subdomain.join('-')}.#{TUNNEL_HOST}"
-  end
-
-  def config
-    "*:#{remote_port}:#{local_hostname}:#{local_port}"
   end
 
   def cannot_determine_port!
