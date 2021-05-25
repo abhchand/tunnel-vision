@@ -38,7 +38,13 @@ class TunnelVision < Thor
   TUNNEL_USER = 'exec'.freeze
   VERSION = '0.1.0'
 
-  method_option :user, required: true, aliases: '-u', desc: 'User for tunnel hostname'
+  method_option(
+    :user,
+    required: false,
+    default: `whoami`,
+    aliases: '-u',
+    desc: 'User for tunnel hostname'
+  )
   method_option(
     :application,
     required: false,
@@ -101,7 +107,7 @@ tunnel-vision (v#{VERSION})
   end
 
   def user
-    @user ||= options[:user]
+    options[:user]
   end
 
   def local_hostname
