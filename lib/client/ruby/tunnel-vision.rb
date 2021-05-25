@@ -32,6 +32,8 @@ class TunnelVision < Thor
 
   class InvalidArgument < ::StandardError; end
 
+  DEFAULT_APPLICATION = 'callrail'.freeze
+
   TUNNEL_HOST = 'pipe.cr-tunnel.xyz'.freeze
   TUNNEL_USER = 'exec'.freeze
   VERSION = '0.1.0'
@@ -40,7 +42,7 @@ class TunnelVision < Thor
   method_option(
     :application,
     required: false,
-    default: 'callrail',
+    default: DEFAULT_APPLICATION,
     aliases: '-a',
     desc: 'Name of your target application'
   )
@@ -76,6 +78,8 @@ tunnel-vision (v#{VERSION})
     Application:    #{"#{application}".colorize(:cyan)}
     Tunneling from: #{"#{TUNNEL_USER}@#{TUNNEL_HOST} (port: #{remote_port})".colorize(:cyan)}
     Tunneling to:   #{"#{local_hostname}:#{local_port}".colorize(:cyan)}
+
+    Tunnel URL:     #{url.colorize(:cyan).underline}
 
     DEBUG
 
@@ -128,6 +132,13 @@ tunnel-vision (v#{VERSION})
 
       found_user[application]
     end
+  end
+
+  def url
+    subdomain = [user]
+    subdomain << application if application != DEFAULT_APPLICATION
+
+    "https://#{subdomain.join('-')}.#{TUNNEL_HOST}"
   end
 
   def config
