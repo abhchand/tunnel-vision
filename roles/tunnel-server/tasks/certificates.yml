@@ -75,6 +75,17 @@
   notify:
     - Restart Nginx
 
+- name: Re-generate users.json
+  when: app_domain_certs_exist|d(False) == True
+  template:
+    src: users.json.j2
+    dest: "{{ app_webroot }}/users.json"
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
+    mode: 0755
+  notify:
+    - Restart Nginx
+
 
 # Certbot automatically schedules itself to check twice a day
 # for renewal (`certbot renew`). It registers itself as a system
