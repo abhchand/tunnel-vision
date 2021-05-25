@@ -10,12 +10,18 @@
 
 require 'bundler/inline'
 
-gemfile true do
- source 'https://rubygems.org'
- gem 'colorize', '~> 0.8.1'
- gem 'thor', '~> 1.0', '>= 1.0.1'
+begin
+  original_stdout = $stdout
+  $stdout = File.open(File::NULL, 'w')
+
+  gemfile true do
+   source 'https://rubygems.org'
+   gem 'colorize', '~> 0.8.1'
+   gem 'thor', '~> 1.0', '>= 1.0.1'
+  end
+ensure
+  $stdout = original_stdout
 end
-puts "\n\n"
 
 require 'thor'
 require 'yaml'
