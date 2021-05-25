@@ -73,9 +73,9 @@ class TunnelVision < Thor
     puts <<-DEBUG
 tunnel-vision (v#{VERSION})
 
-    Application:    #{"#{options[:application]}".colorize(:cyan)}
+    Application:    #{"#{application}".colorize(:cyan)}
     Tunneling from: #{"#{TUNNEL_USER}@#{TUNNEL_HOST} (port: #{remote_port})".colorize(:cyan)}
-    Tunneling to:   #{"#{options[:local_hostname]}:#{options[:local_port]}".colorize(:cyan)}
+    Tunneling to:   #{"#{local_hostname}:#{local_port}".colorize(:cyan)}
 
     DEBUG
 
@@ -92,8 +92,20 @@ tunnel-vision (v#{VERSION})
 
   private
 
+  def application
+    options[:application]
+  end
+
   def user
     @user ||= options[:user]
+  end
+
+  def local_hostname
+    options[:local_hostname]
+  end
+
+  def local_port
+    options[:local_port]
   end
 
   def remote_port
@@ -112,18 +124,18 @@ tunnel-vision (v#{VERSION})
 
       found_user = YAML.load(res.body)[user]
       cannot_determine_port! unless found_user
-      cannot_determine_port! unless found_user.key?(options[:application])
+      cannot_determine_port! unless found_user.key?(application)
 
-      found_user[options[:application]]
+      found_user[application]
     end
   end
 
   def config
-    "*:#{remote_port}:#{options[:local_hostname]}:#{options[:local_port]}"
+    "*:#{remote_port}:#{local_hostname}:#{local_port}"
   end
 
   def cannot_determine_port!
-    msg = "Can not determine remote port for #{options[:application]}. Please specify `-r` " +
+    msg = "Can not determine remote port for #{application}. Please specify `-r` " +
       "or ensure your remote user is configured correctly."
     raise InvalidArgument, msg.colorize(:red)
   end
