@@ -94,7 +94,7 @@ class TunnelVision < Thor
     `start` can also read options from a config file.
     For more information see:
 
-    #{'https://github.com/abhchand/tunnel-vision#config-file'.colorize(:cyan).underline}
+    #{'https://github.com/abhchand/tunnel-vision#optional-config-file'.colorize(:cyan).underline}
   LONGDESC
   def start
     puts "tunnel-vision (v#{VERSION})\n\n"

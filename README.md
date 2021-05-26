@@ -19,7 +19,7 @@
     + [Register new user](#register-new-user)
     + [Install the Ruby Client](#install-the-ruby-client)
 - [Run](#run)
-    + [Config File](#config-file)
+    + [Optional Config File](#optional-config-file)
 - [Playbook Developer Setup](#playbook-developer-setup)
 
 
@@ -86,7 +86,7 @@ The `tunnel-vision` client will provide you with the tunnel URL.
 
 See `tunnel-vision help start` for more information about options and their default values.
 
-### Config File
+### Optional Config File
 
 Do you hate typing? The `tunnel-vision` client can automatically read from a config file (`~/.tunnel-vision-config`) if present.
 
