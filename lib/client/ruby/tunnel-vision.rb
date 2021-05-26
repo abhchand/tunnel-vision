@@ -77,19 +77,16 @@ class TunnelVision < Thor
     required: false,
     aliases: '-r',
     desc: 'Remote port to connect to on pipe server. ' +
-      "Automatically parsed from #{PORT_MAPPING_URL} if not specified."
+      "Automatically parsed from #{PORT_MAPPING_URL.colorize(:cyan).underline} " +
+      "if not specified."
   )
 
   desc 'start', 'Start an ssh tunnel for public access'
   long_desc <<-LONGDESC
     `start` can also read options from a config file.
-
-    Any command line options will override values defined in the config file.
-
     For more information see:
 
-    #{'https://github.com/abhchand/tunnel-vision#config-file'.underline}
-    ```
+    #{'https://github.com/abhchand/tunnel-vision#config-file'.colorize(:cyan).underline}
   LONGDESC
   def start
     puts <<-DEBUG
