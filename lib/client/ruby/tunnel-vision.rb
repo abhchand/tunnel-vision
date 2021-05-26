@@ -37,6 +37,7 @@ class TunnelVision < Thor
 
   TUNNEL_HOST = 'pipe.cr-tunnel.xyz'.freeze
   TUNNEL_USER = 'exec'.freeze
+  PORT_MAPPING_URL = "https://#{TUNNEL_HOST}/users.json".freeze
   VERSION = '0.1.0'
 
   CONFIG_FILE = File.expand_path('~/.tunnel-vision-config')
@@ -76,7 +77,7 @@ class TunnelVision < Thor
     required: false,
     aliases: '-r',
     desc: 'Remote port to connect to on pipe server. ' +
-      'Automatically parsed from remote config if not specified.'
+      "Automatically parsed from #{PORT_MAPPING_URL} if not specified."
   )
 
   desc 'start', 'Start an ssh tunnel for public access'
@@ -177,10 +178,9 @@ tunnel-vision (v#{VERSION})
       return opts['remote_port'] if opts['remote_port']
 
       # Try to automatically determine this user's port mapping
-      # A JSON mapping file should be available at
-      #   "https://#{TUNNEL_HOST}/users.json"
+      # A JSON mapping file should be available at `PORT_MAPPING_URL`
 
-      uri = URI("https://#{TUNNEL_HOST}/users.json")
+      uri = URI(PORT_MAPPING_URL)
       res = Net::HTTP.get_response(uri)
 
       cannot_determine_port! unless (200..299).include?(res.code.to_i)
