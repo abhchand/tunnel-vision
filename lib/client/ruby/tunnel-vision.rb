@@ -80,6 +80,14 @@ class TunnelVision < Thor
       "Automatically parsed from #{PORT_MAPPING_URL.colorize(:cyan).underline} " +
       "if not specified."
   )
+  method_option(
+    :verbose,
+    type: :boolean,
+    required: false,
+    default: false,
+    aliases: '-v',
+    desc: 'Enable verbose output'
+  )
 
   desc 'start', 'Start an ssh tunnel for public access'
   long_desc <<-LONGDESC
@@ -89,9 +97,15 @@ class TunnelVision < Thor
     #{'https://github.com/abhchand/tunnel-vision#config-file'.colorize(:cyan).underline}
   LONGDESC
   def start
-    puts <<-DEBUG
-tunnel-vision (v#{VERSION})
+    puts "tunnel-vision (v#{VERSION})\n\n"
 
+    if verbose?
+      puts "Command Line Options: #{command_line_options}"
+      puts "Config File Options:  #{config_file_options}"
+      puts "Combined Options:     #{opts}\n"
+    end
+
+    puts <<-DEBUG
     Application:    #{"#{application}".colorize(:cyan)}
     Tunneling from: #{"#{TUNNEL_USER}@#{TUNNEL_HOST} (port: #{remote_port})".colorize(:cyan)}
     Tunneling to:   #{"#{local_hostname}:#{local_port}".colorize(:cyan)}
@@ -148,7 +162,7 @@ tunnel-vision (v#{VERSION})
     @config_file_options ||= begin
       return {} unless File.exists?(CONFIG_FILE)
 
-      puts "Reading from config file #{CONFIG_FILE}\n\n"
+      puts "Found config file #{CONFIG_FILE}\n\n"
       JSON.parse(File.read(CONFIG_FILE))
     end
   end
@@ -169,6 +183,10 @@ tunnel-vision (v#{VERSION})
     opts['local_port']
   end
 
+  def verbose?
+    opts['verbose']
+  end
+
   def remote_port
     @remote_port ||= begin
       # Try reading from the options, if specified
@@ -177,11 +195,13 @@ tunnel-vision (v#{VERSION})
       # Try to automatically determine this user's port mapping
       # A JSON mapping file should be available at `PORT_MAPPING_URL`
 
+      puts "GET #{PORT_MAPPING_URL}" if verbose?
       uri = URI(PORT_MAPPING_URL)
       res = Net::HTTP.get_response(uri)
 
       cannot_determine_port! unless (200..299).include?(res.code.to_i)
 
+      puts "Response:\n#{res.body}" if verbose?
       found_user = YAML.load(res.body)[user]
       cannot_determine_port! unless found_user
       cannot_determine_port! unless found_user.key?(application)
