@@ -88,9 +88,9 @@ See `tunnel-vision help start` for more information about options and their defa
 
 ### Config File
 
-Hate typing? The `tunnel-vision` client will automatically read from a config file (`~/.tunnel-vision-config`) if present.
+Do you hate typing? The `tunnel-vision` client can automatically read from a config file (`~/.tunnel-vision-config`) if present.
 
-The config is a JSON file options for each application. Any values specified on the command line will always override values in the config file.
+The config is a JSON file of options for each application. Any values specified on the command line will always override values in the config file.
 
 ```json
 {
@@ -103,6 +103,10 @@ The config is a JSON file options for each application. Any values specified on 
     "local_port": 7000
   }
 }
+```
+
+```bash
+tunnel-vision start -a swappy
 ```
 
 Note that the config names are the snake case version of the long option name (e.g. `-h` -> `local-hostname` -> `local_hostname`)
