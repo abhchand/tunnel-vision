@@ -82,7 +82,7 @@ tunnel-vision start -a callrail -h 0.0.0.0 -p 5000  # e.g. callrail
 tunnel-vision start -a swappy -h 0.0.0.0 -p 7000    # e.g. swappy
 ```
 
-The `tunnel-vision` client will provide with the appropriate tunnel URL.
+The `tunnel-vision` client will provide you with the tunnel URL.
 
 See `tunnel-vision help start` for more information about options and their default values.
 
