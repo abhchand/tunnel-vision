@@ -19,6 +19,7 @@
     + [Register new user](#register-new-user)
     + [Install the Ruby Client](#install-the-ruby-client)
 - [Run](#run)
+    + [Config File](#config-file)
 - [Playbook Developer Setup](#playbook-developer-setup)
 
 
@@ -67,22 +68,44 @@ curl --silent 'https://raw.githubusercontent.com/abhchand/tunnel-vision/master/l
 
 You'll need to start a separate tunnel for _each target application_ you'd like to connect to.
 
-Start your application (either manually, with `docker`, etc...)
+Start your application. This could be manually, indirectly via `docker`, etc...
 
 ```bash
-bundle exec rails server -b 0.0.0.0 -p 3000 -e development
+bundle exec rails server -b 0.0.0.0 -p 5000 -e development  # e.g callrail
+bundle exec rails server -b 0.0.0.0 -p 7000 -e development  # e.g swappy
 ```
 
-Start the tunnel to your `$APPLICATION` (`callrail`, `swappy`, etc..) on the same `host` and `port`
+Start a tunnel to your application on the same `host` and `port`
 
 ```bash
-tunnel-vision start -u $USER -a $APPLICATION -h 0.0.0.0 -p 3000
+tunnel-vision start -a callrail -h 0.0.0.0 -p 5000  # e.g. callrail
+tunnel-vision start -a swappy -h 0.0.0.0 -p 7000    # e.g. swappy
 ```
 
-Visit `https://$USER-$APPLICATION.pipe.cr-tunnel.xyz/` in your browser.
+The `tunnel-vision` client will provide with the appropriate tunnel URL.
 
-**NOTE**: If your application is `callrail`, you can visit `https://$USER.pipe.cr-tunnel.xyz/` as a shortcut.
+See `tunnel-vision help start` for more information about options and their default values.
 
+### Config File
+
+Hate typing? The `tunnel-vision` client will automatically read from a config file (`~/.tunnel-vision-config`) if present.
+
+The config is a JSON file options for each application. Any values specified on the command line will always override values in the config file.
+
+```json
+{
+  "callrail": {
+    "local_hostname": "127.0.0.1",
+    "local_port": 5000
+  },
+  "swappy": {
+    "local_hostname": "127.0.0.0",
+    "local_port": 7000
+  }
+}
+```
+
+Note that the config names are the snake case version of the long option name (e.g. `-h` -> `local-hostname` -> `local_hostname`)
 
 # Playbook Developer Setup
 

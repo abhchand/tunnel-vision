@@ -23,6 +23,7 @@ ensure
   $stdout = original_stdout
 end
 
+require 'json'
 require 'thor'
 require 'yaml'
 require 'net/http'
@@ -38,10 +39,12 @@ class TunnelVision < Thor
   TUNNEL_USER = 'exec'.freeze
   VERSION = '0.1.0'
 
+  CONFIG_FILE = File.expand_path('~/.tunnel-vision-config')
+
   method_option(
     :user,
     required: false,
-    default: `whoami`,
+    default: `whoami`.strip,
     aliases: '-u',
     desc: 'User for tunnel hostname'
   )
@@ -50,7 +53,7 @@ class TunnelVision < Thor
     required: false,
     default: DEFAULT_APPLICATION,
     aliases: '-a',
-    desc: 'Name of your target application'
+    desc: 'Name of your target application (callrail, swappy, rowdy, ...)'
   )
   method_option(
     :local_hostname,
@@ -77,6 +80,16 @@ class TunnelVision < Thor
   )
 
   desc 'start', 'Start an ssh tunnel for public access'
+  long_desc <<-LONGDESC
+    `start` can also read options from a config file.
+
+    Any command line options will override values defined in the config file.
+
+    For more information see:
+
+    #{'https://github.com/abhchand/tunnel-vision#config-file'.underline}
+    ```
+  LONGDESC
   def start
     puts <<-DEBUG
 tunnel-vision (v#{VERSION})
@@ -103,26 +116,65 @@ tunnel-vision (v#{VERSION})
 
   private
 
+  # Combine options from multiple sources into one unified options `Hash`
+  # Returns all keys as `String` keys
+  #
+  # In order of highest precedence:
+  #
+  #   * Options specified on the command line
+  #   * Options specified in the config file for this application
+  #   * Default value defined in the `method_option`
+  def opts
+    @opts ||= begin
+      application = command_line_options['application']
+
+      (config_file_options[application] || {}).
+        merge(command_line_options)
+    end
+  end
+
+  # Return options specified on the command line by the user
+  # Returns all keys as `String` keys
+  def command_line_options
+    @command_line_options ||= begin
+      {}.tap do |str_options|
+        options.each { |k,v| str_options[k.to_s] = v }
+      end
+    end
+  end
+
+  # Read options from the config file `CONFIG_FILE`
+  # Returns {} if no config file is found.
+  # Returns all keys as `String` keys
+  def config_file_options
+    @config_file_options ||= begin
+      return {} unless File.exists?(CONFIG_FILE)
+
+      puts "Reading from config file #{CONFIG_FILE}\n\n"
+      JSON.parse(File.read(CONFIG_FILE))
+    end
+  end
+
   def application
-    options[:application]
+    opts['application']
   end
 
   def user
-    options[:user]
+    opts['user']
   end
 
   def local_hostname
-    options[:local_hostname]
+    opts['local_hostname']
   end
 
   def local_port
-    options[:local_port]
+    opts['local_port']
   end
 
   def remote_port
     @remote_port ||= begin
       # Try reading from the options, if specified
-      return options[:remote_port] if options[:remote_port]
+      return opts['remote_port'] if opts['remote_port']
 
       # Try to automatically determine this user's port mapping
       # A JSON mapping file should be available at
@@ -149,8 +201,8 @@ tunnel-vision (v#{VERSION})
   end
 
   def cannot_determine_port!
-    msg = "Can not determine remote port for #{application}. Please specify `-r` " +
-      "or ensure your remote user is configured correctly."
+    msg = "Can not determine #{user}'s remote port for #{application}."
+
     raise InvalidArgument, msg.colorize(:red)
   end
 end
