@@ -38,7 +38,7 @@ class TunnelVision < Thor
   TUNNEL_HOST = 'pipe.cr-tunnel.xyz'.freeze
   TUNNEL_USER = 'exec'.freeze
   PORT_MAPPING_URL = "https://#{TUNNEL_HOST}/users.json".freeze
-  VERSION = '0.1.0'
+  VERSION = '0.2.0'
 
   CONFIG_FILE = File.expand_path('~/.tunnel-vision-config')
 
